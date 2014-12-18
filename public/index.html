@@ -23,6 +23,22 @@
 
 
     <script>
+        var onPlayerReady = null;
+        var onPlayerStateChange = null;
+        window.onYouTubePlayerAPIReady = function(){
+            console.log("api loading");
+            
+            window.player = new YT.Player('player', {
+              height: '390',
+              width: '640',
+              events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+              }
+            });
+            
+        }
+
         $(function(){
         var socket = io();
         var queue = [];
@@ -57,21 +73,9 @@
           }); 
         }
         
-        window.onYouTubePlayerAPIReady = function(){
-            console.log("api loading");
-            
-            player = new YT.Player('player', {
-              height: '390',
-              width: '640',
-              events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
-              }
-            });
-            
-        }
+
         
-        function onPlayerReady(event) {
+        onPlayerReady = function(event) {
             shitActive=true;
             console.log("player active");
 
@@ -84,7 +88,7 @@
             }
         }
             
-        function onPlayerStateChange(event){
+        onPlayerStateChange = function(event){
             if(event.data != 0 || !player || !player.loadVideoById || !shitActive)   return;
             var song = queue[index];
             console.log(song);
