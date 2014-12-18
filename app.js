@@ -11,6 +11,8 @@ var client = request.newClient('http://gdata.youtube.com/');
 app.use(express.static(__dirname + '/public'));
 
 
+
+
 var queue = [];
 
 
@@ -49,7 +51,15 @@ io.on('connection', function(socket){
 });
 
 
-
-http.listen(80, '0.0.0.0', function(){
-  console.log('listening on *:3000');
+var port = process.env.PORT || 3000;
+http.listen(port, function(){
+  console.log('listening on *:' + port);
 });
+
+
+
+// // Heroku setting for long polling
+// io.configure(function () { 
+//     io.set("transports", ["xhr-polling"]); 
+//     io.set("polling duration", 10); 
+// });
