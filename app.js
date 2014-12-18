@@ -51,11 +51,7 @@ io.on('connection', function(socket){
   io.emit("queue.changed", queue);
 });
 
-// Heroku setting for long polling
-io.configure(function () { 
-    io.set("transports", ["xhr-polling"]); 
-    io.set("polling duration", 10); 
-});
+
 
 var port = process.env.PORT || 3000;
 server.listen(port, function(){
