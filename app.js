@@ -1,8 +1,7 @@
 var express = require("express")
 
 var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var io = require('socket.io')(app);
 
 var request = require('request-json');
 var client = request.newClient('http://gdata.youtube.com/');
@@ -50,17 +49,17 @@ io.on('connection', function(socket){
   io.emit("queue.changed", queue);
 });
 
-// Heroku setting for long polling
-io.configure(function () { 
-    io.set("transports", ["xhr-polling"]); 
-    io.set("polling duration", 10); 
-});
-
 var port = process.env.PORT || 3000;
-http.listen(port, function(){
+app.listen(port, function(){
   console.log('listening on *:' + port);
 });
 
+
+// Heroku setting for long polling
+// io.configure(function () { 
+//     io.set("transports", ["xhr-polling"]); 
+//     io.set("polling duration", 10); 
+// });
 
 
 
