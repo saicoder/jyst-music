@@ -50,6 +50,6 @@ io.on('connection', function(socket){
 
 
 
-http.listen(process.env.PORT || 3000, '0.0.0.0', function(){
+http.listen(80, '0.0.0.0', function(){
   console.log('listening on *:3000');
 });
