@@ -35,6 +35,7 @@ io.on('connection', function(socket){
       
       client.get('feeds/api/videos/' + video_id + '?v=2&alt=jsonc', function(err, res, body){
         if(err) return;   
+        try {
         var song = {
           url: video_id,
           title: body.data.title,
@@ -43,6 +44,7 @@ io.on('connection', function(socket){
         }
         queue.push(song);
         io.emit("queue.changed", queue);
+        } catch(e){}
       });
       
       
