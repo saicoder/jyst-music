@@ -1,0 +1,101 @@
+<html>
+    <body>
+        <h2>Music Box</h2>
+        
+        <div id="player"></div>
+        
+        <form url="/?test=2">
+            <h4>Append Song</h4>
+            <input type="text" id="url" />
+        </form>
+        
+        
+        <ul id="videos">
+            
+        </ul>
+    
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="http://www.youtube.com/player_api"></script>
+    <script src="/socket.io/socket.io.js"></script>
+      
+    </body>
+    
+
+
+    <script>
+        $(function(){
+        var socket = io();
+        var queue = [];
+        window.index = 0;
+        var waiting = true, shitActive=false;
+        
+        $('form').submit(function(){
+            socket.emit('chat message', {url: $('#url').val()} );
+            $('#url').val('');
+            
+            return false;
+        });
+        
+        
+        socket.on("queue.changed",function(nqueue){
+           
+            queue = nqueue;
+            renderList();
+            if(waiting){onPlayerStateChange({data: 0}); waiting=false; }
+        });
+        
+        function renderList(){
+          $("#videos").html("");
+          
+            
+          $.each(queue, function(){
+
+              var item = $("<div></div>").appendTo($("#videos"));
+            
+              $("<img />").attr("src", this.image).appendTo(item);
+              $("<h4></h4>").text(this.title).appendTo(item);
+          }); 
+        }
+        
+        window.onYouTubePlayerAPIReady = function(){
+            
+            player = new YT.Player('player', {
+              height: '390',
+              width: '640',
+              events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+              }
+            });
+   
+        }
+        
+        function onPlayerReady(event) {
+            shitActive=true;
+            
+            var song = queue[index];
+            if(song == undefined)waiting = true;
+            else
+            {
+                player.loadVideoById(queue[index].url);
+                player.playVideo();
+            }
+        }
+            
+        function onPlayerStateChange(event){
+            if(event.data != 0 || !player || !player.loadVideoById || !shitActive)   return;
+            var song = queue[index];
+            console.log(song);
+            
+            if(song != undefined){
+                index+=1;
+                player.loadVideoById(song.url);
+                player.playVideo();
+            }else{ waiting = true; }
+        }
+            
+        });
+        
+    </script>
+    
+</html>
