@@ -1,9 +1,9 @@
 var express = require("express")
 var http = require('http')
-var app = express();
 
+var app = express();
 var server = http.createServer(app);
-var io = require('socket.io')(http);
+var io = require('socket.io').listen(server);
 
 var request = require('request-json');
 var client = request.newClient('http://gdata.youtube.com/');
