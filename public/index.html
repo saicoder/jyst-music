@@ -1,103 +1,67 @@
+<!doctype html>
 <html>
-    <body>
-        <h2>Music Box</h2>
-        
-        <div id="player"></div>
-        
-        <form url="/?test=2">
-            <h4>Append Song</h4>
-            <input type="text" id="url" />
-        </form>
-        
-        
-        <ul id="videos">
-            
-        </ul>
+  <head>
+    <title>Page</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <link rel="stylesheet" href="bower_components/foundation/css/normalize.css">
+    <link rel="stylesheet" href="bower_components/foundation/css/foundation.css">
+    
+    <script src="bower_components/jquery/dist/jquery.js"></script>
     
     <script src="/socket.io/socket.io.js"></script>
-      
-    </body>
+    <!-- APP -->
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-foundation/mm-foundation-tpls.js"></script>
+    <script src="js/you_play.js"></script>
+    <script src="js/main.js"></script>
     
-
-
     <script>
-     
-        var socket = io();
-        var queue = [];
-        window.index = 0;
-        var waiting = true, shitActive=false;
-        
-        $('form').submit(function(){
-            socket.emit('chat message', {url: $('#url').val()} );
-            $('#url').val('');
-            
-            return false;
-        });
-        
-        
-        socket.on("queue.changed",function(nqueue){
-           
-            queue = nqueue;
-            renderList();
-            if(waiting){onPlayerStateChange({data: 0}); waiting=false; }
-        });
-        
-        function renderList(){
-          $("#videos").html("");
-          
-            
-          $.each(queue, function(){
-
-              var item = $("<div></div>").appendTo($("#videos"));
-            
-              $("<img />").attr("src", this.image).appendTo(item);
-              $("<h4></h4>").text(this.title).appendTo(item);
-          }); 
-        }
-        
-        window.onYouTubePlayerAPIReady = function(){
-            console.log("api loading");
-
-            player = new YT.Player('player', {
-              height: '390',
-              width: '640',
-              events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
-              }
-            });
-            
-        }
-        
-        function onPlayerReady(event) {
-            shitActive=true;
-            console.log("player active");
-
-            var song = queue[index];
-            if(song == undefined)waiting = true;
-            else
-            {
-                player.loadVideoById(queue[index].url);
-                player.playVideo();
-            }
-        }
-            
-        function onPlayerStateChange(event){
-            if(event.data != 0 || !player || !player.loadVideoById || !shitActive)   return;
-            var song = queue[index];
-            console.log(song);
-            
-            if(song != undefined){
-                index+=1;
-                player.loadVideoById(song.url);
-                player.playVideo();
-            }else{ waiting = true; }
-        }
-            
- 
-        
+      //start app
+      angular.element(document).ready(function() {
+          //start app
+          youPlay.whenLoaded(function(){ angular.bootstrap(document, ['musicBox']); });
+      });
     </script>
     <script src="https://www.youtube.com/iframe_api"></script>
+    
+  </head>
+  <body>
+   
+    <div ng-controller="QueueController" class="row">
+     <div class="large-12 column">
+       <h3>Add new Song</h3>
+
+     
+         <div class="row collapse ">
+            <div class="small-12 column">
+               <input type="text" ng-model="newSong" 
+                  typeahead="video for video in getVideos($viewValue)"  
+                  typeahead-editable="false"
+                  placeholder="tipe song name"
+                  typeahead-on-select="addNewSong()"
+                  typeahead-template-url="item-search"/>
+                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+            </div>
+           
+          </div> 
+       
+
+       <div ng-repeat="song in activeSongs()">
+         <h4> <img ng-src="{{song.image}}" /> {{song.title}} </h4>
+       </div>
+    </div>
+   </div>
+   
+   <script type="text/ng-template" id="item-search">
+      <span>
+      <img ng-src="{{match.model.image}}" style="float:left; height: 40px; padding: 3px;" />
+      <a tabindex="-1" bind-html-unsafe="match.model.title | typeaheadHighlight:query"></a>
+      <div style="clear:both">
+      </span>
+    </script>
+   
+  </body>
+  
 </html>

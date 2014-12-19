@@ -5,52 +5,36 @@ var app = express();
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
-var request = require('request-json');
-var client = request.newClient('http://gdata.youtube.com/');
-
 
 app.use(express.static(__dirname + '/public'));
 
 
 
+//app specific
 
-var queue = [];
+var queue = new (require('./queue')) ();
 
-
-app.get("/", function(req,res){
-    res.render("index");
-});
-
-
-app.post("/",function(req, res){
-    res.end("fuck " + req.body + req.params.test);
-});
 
 
 io.on('connection', function(socket){
   console.log('a user connected');
   
-  socket.on('chat message', function(t){
-      var video_id = t.url;
-      
-      client.get('feeds/api/videos/' + video_id + '?v=2&alt=jsonc', function(err, res, body){
-        if(err) return;   
-        try {
-        var song = {
-          url: video_id,
-          title: body.data.title,
-          image: body.data.thumbnail.sqDefault,
-          duration: body.data.duration
-        }
-        queue.push(song);
-        io.emit("queue.changed", queue);
-        } catch(e){}
+  //append song
+  socket.on('queue.append', function(t){
+    console.log('t is', t);
+      queue.add({video_id: t.id}).then(function(state){
+        io.emit("queue.changed", state);
+      }, function(error){
+        console.log("Invalid video");
       });
-      
-      
-  }); 
     
-  io.emit("queue.changed", queue);
+  });
+  
+  //get songs
+  socket.on('queue.get', function(){
+    socket.emit("queue.changed", queue.getState());
+  });
+  
 });
 
 
