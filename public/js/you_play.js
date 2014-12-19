@@ -52,7 +52,7 @@ window.youPlay = new (function(){
 
 
 
-angular.module("YouPlay",[]).factory("yPlayer", function($rootScope){
+angular.module("YouPlay",[]).factory("yPlayer", ['$rootScope', function($rootScope){
   
   youPlay.whenEnded(function(){
     $rootScope.$apply(function(){
@@ -66,4 +66,4 @@ angular.module("YouPlay",[]).factory("yPlayer", function($rootScope){
     seekTo: youPlay.seekTo
   }
   
-});
+}]);

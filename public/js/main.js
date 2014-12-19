@@ -1,6 +1,7 @@
 angular.module("musicBox", ['YouPlay', 'mm.foundation']).
 
-controller("QueueController", function($scope, yPlayer, $http){
+controller("QueueController", ['$scope', 'yPlayer', '$http', function($scope, yPlayer, $http){
+  
   var socket = io();
   $scope.waiting = true;
   $scope.newSongId = 'Tm88QAI8I5A';
@@ -72,7 +73,7 @@ controller("QueueController", function($scope, yPlayer, $http){
   //request queue data
   socket.emit('queue.get');
   
-});
+}]);
 
 
 
