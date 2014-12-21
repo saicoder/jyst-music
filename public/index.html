@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- build:css app.css -->
-    <link rel="stylesheet" href="bower_components/foundation/css/normalize.css">
-    <link rel="stylesheet" href="bower_components/foundation/css/foundation.css">
+    <link rel="stylesheet" href="/bower_components/angular-material/angular-material.css">
+    <link rel="stylesheet" href="styles/app.css">
     <!-- /build -->
     
     
@@ -16,7 +16,12 @@
     <!-- build:js app.min.js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/angular-foundation/mm-foundation-tpls.js"></script>
+    
+    <script src="/bower_components/angular-aria/angular-aria.js"></script>
+    <script src="/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="/bower_components/hammerjs/hammer.js"></script>
+    <script src="/bower_components/angular-material/angular-material.js"></script>
+    
     <script src="js/you_play.js"></script>
     <script src="js/main.js"></script>
     <!-- /build -->
@@ -25,7 +30,8 @@
       //start app
       angular.element(document).ready(function() {
           //start app
-          youPlay.whenLoaded(function(){ angular.bootstrap(document, ['musicBox']); });
+         youPlay.whenLoaded(function(){ angular.bootstrap(document, ['musicBox']); });
+//        angular.bootstrap(document, ['musicBox']);
       });
     </script>
     
@@ -34,40 +40,98 @@
     
   </head>
   <body>
-   
-    <div ng-controller="QueueController" class="row">
-     <div class="large-12 column">
-       <h3>Add new Song</h3>
-
-     
-         <div class="row collapse ">
-            <div class="small-12 column">
-               <input type="text" ng-model="newSong" 
-                  typeahead="video for video in getVideos($viewValue)"  
-                  typeahead-editable="false"
-                  placeholder="tipe song name"
-                  typeahead-on-select="addNewSong()"
-                  typeahead-template-url="item-search"/>
-                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
-            </div>
-           
-          </div> 
-       
-
-       <div ng-repeat="song in activeSongs()">
-         <h4> <img ng-src="{{song.image}}" /> {{song.title}} </h4>
-       </div>
+    <div ng-if="false" class="loader">
+      <div class="spinner">
+      </div>
     </div>
-   </div>
-   
-   <script type="text/ng-template" id="item-search">
-      <span>
-      <img ng-src="{{match.model.image}}" style="float:left; height: 40px; padding: 3px;" />
-      <a tabindex="-1" bind-html-unsafe="match.model.title | typeaheadHighlight:query"></a>
-      <div style="clear:both">
-      </span>
-    </script>
-   
+    
+    <div ng-cloak ng-controller="QueueController" layout="column" layout-fill>
+
+      <!--  TOOLBAR    -->
+      <md-toolbar md-scroll-shrink>
+        <div class="md-toolbar-tools">
+          
+          <input ng-model="newSongName" placeholder="add new song " class="song-finde-text" type="text" />
+          
+        </div>
+      </md-toolbar>
+      
+      
+      <md-content ng-show="!searchActive" class="md-padding silverbg" >
+        <div class="wrapper">
+          
+          <!--    NOW PLAYS      -->
+          <md-card class="whitebg" ng-show="songPlaying"> 
+            <div class="current-song">
+              <div id="player-view" class="current-song-preview"></div>
+              <div class="current-song-info">
+                <h3>{{songPlaying.title}}</h3>  
+                <md-slider ng-model="elipsed" min="0" max="100" step="1" ng-disabled="false" aria-label="Disabled 1"></md-slider>
+                
+                <span ng-show="elipsedms && songPlaying">
+                  {{ getDuration(elipsedms) }} / {{getDuration(songPlaying.duration) }}
+                </span>
+                
+              </div>
+            </div>
+          </md-card>
+          
+          <!--   OTHER SONGS   -->
+          <md-card class="whitebg" ng-show="activeSongs && activeSongs.length">
+            <md-list>
+              <md-item ng-repeat="song in activeSongs">
+                <md-item-content>
+                  <div class="md-tile-left">
+                      <img ng-src="{{song.image}}" class="song-item-preview" >
+                  </div>
+                  <div class="md-tile-content">
+                    <h3>{{song.title}}</h3>
+                    <h4><b> {{ getDuration(song.duration) }}</b> </h4>
+                    
+                  </div>                  
+                </md-item-content>
+                <md-divider class="div-fill" ng-if="!$last"></md-divider>
+              </md-item>
+            </md-list>
+            
+          </md-card>
+          <!--    HELP      -->
+          <md-card ng-show="!activeSongs.length && !songPlaying">
+            <h3> ↑ Add new song to continue ↑</h3>
+            <p>Start creating your playlist </p>
+          </md-card>
+          
+        </div> 
+      </md-content>
+      
+      <md-content ng-if="searchActive">
+        <div class="wrapper">
+          <md-card>
+          <md-list>
+            <md-item ng-click="addNewSong(item)" class="search-item" ng-repeat="item in searchResults">
+              <md-item-content>
+                <div class="md-tile-left">
+                    <img width="120" height="90" ng-src="{{item.image}}" class="search-item-image">
+                </div>
+                
+                <div class="md-tile-content">
+                  <h4>{{item.title}} </h4>
+                  <h4>
+                    <md-button class="md-primary">Add to playlist</md-button>
+                  </h4>
+                </div>
+                
+              </md-item-content>
+              <md-divider class="div-fill" ng-if="!$last"></md-divider>
+            </md-item>
+          </md-list>
+          </md-card>
+        </div>
+      </md-content>
+      
+    </div>
+  
+  
   </body>
   
 </html>

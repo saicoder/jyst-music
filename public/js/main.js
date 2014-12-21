@@ -1,10 +1,12 @@
-angular.module("musicBox", ['YouPlay', 'mm.foundation']).
+angular.module("musicBox", ['YouPlay', 'ngMaterial']).
 
 controller("QueueController", ['$scope', 'yPlayer', '$http', function($scope, yPlayer, $http){
+  //document.getElementById('player-view').appendChild(document.getElementsByTagName('iframe')[0])
   
   var socket = io();
+  $scope.elipsed = 0.01;
   $scope.waiting = true;
-  $scope.newSongId = 'Tm88QAI8I5A';
+  $scope.activeSongs = [];
   
   $scope.play = function(){
     if($scope.queueState.currentSong == null) return;
@@ -22,28 +24,55 @@ controller("QueueController", ['$scope', 'yPlayer', '$http', function($scope, yP
     
     if(nextSong) yPlayer.play(nextSong.id);
     else $scope.waiting = true;
+    
+    $scope.reloadActiveSongs()
   });
   
-  $scope.addNewSong = function(){
-    socket.emit('queue.append', { id: $scope.newSong.id });
-    $scope.newSong = '';
+  $scope.$on('yPlayer.timeChanged', function(e, time){
+    
+    if( $scope.songPlaying == null) return;
+    $scope.elipsedms = time;
+    $scope.elipsed = Math.floor((time /  $scope.songPlaying.duration) * 100)
+    
+  });
+  
+  
+  $scope.getDuration = function(mils){
+    mils = mils / 1000;
+    return Math.floor(mils/60) + ':' + ('0'+ Math.floor(mils % 60 )).slice(-2)
   }
   
-  $scope.activeSongs = function(){
+  $scope.addNewSong = function(song){
+    console.log("add song", $scope.newSong);
+    socket.emit('queue.append', { id: song.id });
+    $scope.newSongName = '';
+  }
+  
+  $scope.reloadActiveSongs = function(){
     if(!$scope.queueState || !$scope.queueState.currentSong) return null;
     var result = []
     angular.forEach($scope.queueState.songs, function(song, i){
-      if(i >= $scope.queueState.currentSong.song_index) result.push(song);
+      if(i > $scope.queueState.currentSong.song_index) result.push(song);
     });
-    return result;
+    
+    $scope.songPlaying = $scope.queueState.songs[$scope.queueState.currentSong.song_index]
+    $scope.activeSongs = result;
   };
   
   
+  $scope.newSongName = "";
+  $scope.$watch('newSongName', function(){
+    if($scope.newSongName.length == 0) $scope.searchActive = false;
+    else {
+      $scope.searchActive = true;
+      $scope.getVideos(); 
+    }
+  });
   
-  $scope.getVideos = function(val) {
+  $scope.getVideos = function() {
     return $http.get('https://gdata.youtube.com/feeds/api/videos', {
       params: {
-        q: val,
+        q: $scope.newSongName,
         'max-results': 10,
         alt: 'json',
         v: 2
@@ -55,10 +84,11 @@ controller("QueueController", ['$scope', 'yPlayer', '$http', function($scope, yP
           id: item.media$group.yt$videoid.$t,
           title: item.title.$t,
           image: item.media$group.media$thumbnail[0].url,
-          toString: function(){ return this.title; }
+          toString: function(){ return this.title; },
+          duration: item.media$group.media$content.duration
         });
       });
-      return videos;
+      $scope.searchResults = videos;
     });
   }
   
@@ -67,7 +97,8 @@ controller("QueueController", ['$scope', 'yPlayer', '$http', function($scope, yP
     $scope.$apply(function(){ 
       $scope.queueState = queue;
       console.log("Have queue", queue);
-      if($scope.waiting) $scope.play();                      
+      if($scope.waiting) $scope.play();    
+      $scope.reloadActiveSongs()
     });
   });
   //request queue data

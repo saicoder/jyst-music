@@ -101,3 +101,64 @@
     </script>
     <script src="https://www.youtube.com/iframe_api"></script>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+  
+  <div ng-controller="QueueController">
+   <top-bar>
+    <ul class="title-area">
+      <li class="name">
+        <h1><a href="#">TeamMusic</a></h1>
+      </li>
+      <li toggle-top-bar class="menu-icon"><a href="#">Menu</a></li>
+    </ul>
+
+    <section class="top-bar-section">
+       
+          <input style="width: 62.5rem" type="text" ng-model="newSong" 
+                 typeahead="video for video in getVideos($viewValue)"  
+                 typeahead-editable="false"
+                 placeholder="tipe song name"
+                 typeahead-on-select="addNewSong()"
+                 typeahead-template-url="item-search"/>
+          
+     </section>
+  </top-bar>
+     
+    <div class="row music-box-app">
+     <div class="large-12 column">
+
+      
+        <section ng-show="songPlaying" class="song-playing block">
+          <div class="player-view" id="player-view"></div>
+          <div class="video-status">
+            <h3 class="subheader">{{songPlaying.title}}</h3>  
+          </div>
+          <div class="clearfix"></div>
+        </section>
+        
+        <div class="song-item block"  ng-repeat="song in activeSongs"> 
+           <img ng-src="{{song.image}}" /> </a> <span class="title">{{song.title}}</span>
+        </div>
+    </div>
+   </div>
+</div>
+   <script type="text/ng-template" id="item-search">
+   
+      <img ng-src="{{match.model.image}}" style="float:left; height: 50px; padding: 3px;" />
+      <a bind-html-unsafe="match.model.title | typeaheadHighlight:query"></a>
+      <div style="clear:both">
+ 
+    </script>
+   
+
+

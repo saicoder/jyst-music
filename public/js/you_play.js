@@ -23,12 +23,22 @@ window.youPlay = new (function(){
     
     angular.element(document).ready(function() {
       var playerDiv = document.createElement("DIV");
-      playerDiv.style.display = 'none';
-      document.getElementsByTagName('BODY')[0].appendChild(playerDiv);
-
+//      playerDiv.style.display = 'none';
+      var playerView = document.getElementById('player-view');
+      playerView.appendChild(playerDiv);
+      playerView.style.width = '300px'
+      playerView.style.height = '169px'
+      
       _this.player = new YT.Player(playerDiv, {
-        height: '390',
-        width: '640',
+        height: 169,
+        width: 300,
+        playerVars: {
+          controls: 0,
+          disablekb: true,
+          rel: 0,
+          showinfo: false,
+          //origin:''
+        },
         events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
       }); 
     });
@@ -41,9 +51,9 @@ window.youPlay = new (function(){
   }
   this.whenEnded = function(func){ onVideoEnds = func; }
   
-  this.seekTo = function(time){ _this.player.seekTo(time / 1000, true); }
+  this.seekTo = function(time){ if(_this.player)_this.player.seekTo(time / 1000, true); }
   this.play = function(id, time){
-    _this.player.loadVideoById(id);
+    if(_this.player) _this.player.loadVideoById(id);
     if(time) _this.seekTo(time);
       
   }
@@ -60,6 +70,14 @@ angular.module("YouPlay",[]).factory("yPlayer", ['$rootScope', function($rootSco
     });
   });
   
+  setInterval(function(){
+    if(youPlay.player.getPlayerState() != 1) return; //playing
+    
+    $rootScope.$apply(function(){
+      $rootScope.$broadcast("yPlayer.timeChanged", youPlay.player.getCurrentTime() * 1000);
+    });
+  
+  },1000);
   
   return {
     play: youPlay.play,
