@@ -66,8 +66,8 @@ body{ background-color: #f9f9f9; position: relative;}
 .search-item { cursor: pointer; }
 .search-item  { background-color: #eee !important; } 
 
-
-
+/*fix*/
+.md-thumb{display: none; }  
 
 
 /* LOADER */
