@@ -23,6 +23,8 @@ function Queue(){
     //load form youtube
     client.get('feeds/api/videos/' + song_req.video_id + '?v=2&alt=jsonc', function(err, res, body){
       if(err != null || body.error != null) return deferred.reject(new Error("Invalid youtube video"));
+      if(body.data.accessControl && body.data.accessControl.embed  == 'denied ') 
+        return deferred.reject(new Error("Video cant be embeded"));
       
       var song = {
           id: song_req.video_id,
