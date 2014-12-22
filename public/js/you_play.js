@@ -81,7 +81,12 @@ angular.module("YouPlay",[]).factory("yPlayer", ['$rootScope', function($rootSco
   
   return {
     play: youPlay.play,
-    seekTo: youPlay.seekTo
+    seekTo: youPlay.seekTo,
+    mute: function(val){
+      if(typeof val == 'undefined') return youPlay.player.isMuted();
+      if(val) youPlay.player.mute();
+      else youPlay.player.unMute();
+    }
   }
   
 }]);

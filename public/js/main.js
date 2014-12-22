@@ -35,6 +35,8 @@ controller("QueueController", ['$scope', 'yPlayer', '$http', function($scope, yP
     $scope.elipsed = Math.floor((time /  $scope.songPlaying.duration) * 100)
     
   });
+  //mute unmute
+  $scope.toggleMute = function(){ $scope.muted = !$scope.muted; yPlayer.mute($scope.muted); }
   
   
   $scope.getDuration = function(mils){
