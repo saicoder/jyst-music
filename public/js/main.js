@@ -77,17 +77,20 @@ controller("QueueController", ['$scope', 'yPlayer', '$http', function($scope, yP
         q: $scope.newSongName,
         'max-results': 10,
         alt: 'json',
+        format: 5, //only videos that can be embeded
         v: 2
       }
     }).then(function(res){
       var videos = [];
       angular.forEach(res.data.feed.entry, function(item){
-        videos.push({
+        if(!item.media$group.media$content)return;
+        
+         videos.push({
           id: item.media$group.yt$videoid.$t,
           title: item.title.$t,
           image: item.media$group.media$thumbnail[0].url,
           toString: function(){ return this.title; },
-          duration: item.media$group.media$content.duration
+          duration: item.media$group.yt$duration.seconds * 1000
         });
       });
       $scope.searchResults = videos;
@@ -103,6 +106,11 @@ controller("QueueController", ['$scope', 'yPlayer', '$http', function($scope, yP
       $scope.reloadActiveSongs()
     });
   });
+  
+  socket.on('conected_users.changed', function(connected_users){
+    $scope.$apply(function(){ $scope.connected_users = connected_users; });
+  });
+  
   //request queue data
   socket.emit('queue.get');
   

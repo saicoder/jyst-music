@@ -15,10 +15,12 @@ app.use(express.static(__dirname + clientDir))
 
 var queue = new (require('./queue')) ()
 
-
+var conected_users = 0;
 
 io.on('connection', function(socket){
   console.log('a user connected')
+  conected_users ++;
+  io.emit("conected_users.changed", {count: conected_users});
   
   //append song
   socket.on('queue.append', function(t){
@@ -36,7 +38,12 @@ io.on('connection', function(socket){
     socket.emit("queue.changed", queue.getState());
   })
   
+  socket.on('disconnect', function() { 
+    conected_users--;
+    io.emit("conected_users.changed", {count: conected_users});
+  });
 })
+
 
 
 

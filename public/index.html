@@ -63,11 +63,14 @@
           
           <!--    NOW PLAYS      -->
           <md-card class="whitebg" ng-show="songPlaying"> 
+            <img style="margin:0" hide-gt-sm  ng-src="{{songPlaying.image}}" class="search-item-image">
+            
             <div class="current-song">
-              <div id="player-view" class="current-song-preview"></div>
+              <div id="player-view" hide-sm class="current-song-preview"></div>
+              
               <div class="current-song-info">
                 <h3>
-                  {{songPlaying.title}}
+                  {{songPlaying.title}} <span class="conected-count"> <i class="fa fa-user"></i> {{connected_users.count}}</span>
                 </h3>  
                 <md-slider ng-model="elipsed" min="0" max="100" step="1" ng-disabled="false" aria-label="Disabled 1"></md-slider>
                 
@@ -76,7 +79,7 @@
                 </span>
             
               </div>
-               <div style="float: right;">
+               <div hide-sm style="float: right;">
                   <md-button  
                          class="md-fab" 
                          ng-class="{'md-primary':!muted, 'md-warn':muted}" 
@@ -96,7 +99,7 @@
           <!--   OTHER SONGS   -->
           <md-card class="whitebg" ng-show="activeSongs && activeSongs.length">
             <md-list>
-              <md-item ng-repeat="song in activeSongs">
+              <md-item class="song-item" ng-repeat="song in activeSongs">
                 <md-item-content>
                   <div class="md-tile-left">
                       <img ng-src="{{song.image}}" class="song-item-preview" >
@@ -128,7 +131,8 @@
             <md-item ng-click="addNewSong(item)" class="search-item" ng-repeat="item in searchResults">
               <md-item-content>
                 <div class="md-tile-left">
-                    <img width="120" height="90" ng-src="{{item.image}}" class="search-item-image">
+                    <img  ng-src="{{item.image}}" class="search-item-image">
+                    <span class="duration">{{getDuration(item.duration)}}</span>
                 </div>
                 
                 <div class="md-tile-content">
