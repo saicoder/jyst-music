@@ -49,10 +49,10 @@
     <div ng-cloak ng-controller="QueueController" layout="column" layout-fill>
 
       <!--  TOOLBAR    -->
-      <md-toolbar md-scroll-shrink>
+      <md-toolbar ng-class="{focused: focused}" md-scroll-shrink>
         <div class="md-toolbar-tools">
           
-          <input ng-model="newSongName" placeholder="add new song " class="song-finde-text" type="text" />
+          <input ng-blur="focused=false" ng-focus="focused=true" ng-model="newSongName" placeholder="add new song " class="song-finde-text" type="text" />
           
         </div>
       </md-toolbar>

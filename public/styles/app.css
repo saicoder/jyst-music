@@ -57,7 +57,7 @@ body{ background-color: #f9f9f9; position: relative;}
   
   background: #009CE3;
   border: 0;
-  color: white;
+  color: #1d1d1d;
   border-radius: 3px;
   
   font-size: 18px;
@@ -65,11 +65,19 @@ body{ background-color: #f9f9f9; position: relative;}
   padding: 8px;
   padding-left: 16px;
   letter-spacing: 0.08em;
+  transition: background-color 0.9s ease;
 }
 
 .search-item-image {margin-right: 20px; margin-top: 8px; margin-bottom: 4px;}
 
 .song-finde-text::-webkit-input-placeholder{ color: #54CAFF !important; }
+
+md-toolbar {transition: background-color 0.9s ease;}
+md-toolbar.focused{ background-color: #009BE3; }
+/*md-toolbar.focused .song-finde-text{ background-color: white; }*/
+
+/*md-toolbar.focused .song-finde-text::-webkit-input-placeholder{ color: #9f9f9f !important; }*/
+
 
 .search-item { cursor: pointer; }
 .search-item  { background-color: #eee !important; } 

@@ -6,7 +6,7 @@ var server = http.createServer(app)
 var io = require('socket.io').listen(server)
 
 
-var clientDir = (process.env.NODE_ENV == 'production')? '/dist': '/public'
+var clientDir = '/public';//(process.env.NODE_ENV == 'production')? '/dist': '/public'
 app.use(express.static(__dirname + clientDir))
 
 
